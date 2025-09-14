@@ -21,7 +21,7 @@ BYTE* lzrw3a_c(int action, BYTE* buffer, size_t size, int* pSizeOut) {
         return NULL;
     }
 
-    // compress / decompress buffer
+    // process buffer
     lzrw3a_compress(action, workingMemory, buffer, size, bufferOut, &sizeOut);
     *pSizeOut = sizeOut;
 

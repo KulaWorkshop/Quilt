@@ -1,16 +1,12 @@
-use std::{
-    fs::File,
-    io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write},
-    path::Path,
-};
+use crate::archive::ArchiveType;
+use crate::lzrw3a::{self, CompressAction};
+
+use std::fs::File;
+use std::io::{BufReader, BufWriter, Read, Seek, SeekFrom, Write};
+use std::path::Path;
 
 use byteorder::{LittleEndian, WriteBytesExt};
 use flate2::{Compression, bufread::ZlibEncoder};
-
-use crate::{
-    archive::ArchiveType,
-    lzrw3a::{self, CompressAction},
-};
 
 pub struct ArchiveEncoder {
     ty: ArchiveType,
@@ -35,6 +31,7 @@ impl ArchiveEncoder {
 
         let entry: FileEntry = match self.ty {
             ArchiveType::Pak => {
+                // compress with zlib
                 let reader = BufReader::new(file);
                 let mut encoder = ZlibEncoder::new(reader, Compression::default());
                 let mut buffer = Vec::new();
@@ -48,6 +45,7 @@ impl ArchiveEncoder {
                 }
             }
             ArchiveType::Kub => {
+                // compress with lzrw3a
                 let mut buffer = Vec::new();
                 file.read_to_end(&mut buffer)?;
 
@@ -71,11 +69,11 @@ impl ArchiveEncoder {
         // write file count
         writer.write_u32::<LittleEndian>(self.entries.len() as u32)?;
 
-        // write entries
+        // write blank entries
         for _ in 0..self.entries.len() {
             writer.write_u64::<LittleEndian>(0)?;
 
-            // write filename offset blanks
+            // write blank filename offsets
             if self.ty == ArchiveType::Pak {
                 writer.write_u32::<LittleEndian>(0)?;
             }
@@ -93,12 +91,14 @@ impl ArchiveEncoder {
                 writer.seek(SeekFrom::End(0))?;
             }
 
+            // write padding to 4 byte boundary
             let padding = (4 - (writer.stream_position()? % 4)) % 4;
             for _ in 0..padding {
                 writer.write_u8(0)?;
             }
         }
 
+        // write offsets and sizes
         for (i, e) in self.entries.iter().enumerate() {
             let offset = writer.stream_position()? as u32;
             let size = e.buffer.len() as u32;

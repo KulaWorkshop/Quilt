@@ -2,20 +2,24 @@ mod args;
 mod logger;
 
 use args::Commands;
-use clap::Parser;
-use colored::Colorize;
 use quilt::archive::encoder::ArchiveEncoder;
 use quilt::archive::{Archive, ArchiveType};
 use quilt::lzrw3a::{self, CompressAction};
+
 use std::collections::HashMap;
 use std::fs::{self, File};
-use std::io::{self, BufReader, Read, Write};
+use std::io::{BufReader, Read, Write};
 use std::path::Path;
 use std::time::Instant;
 
+use clap::Parser;
+use colored::Colorize;
+
+const LZRW3A_CREDIT: &str = "using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)";
+
 fn main() {
     // set virtual terminal
-    colored::control::set_virtual_terminal(true).unwrap();
+    colored::control::set_virtual_terminal(true).ok();
 
     // print header
     println!(
@@ -47,6 +51,7 @@ fn main() {
             handle_lzrw3a(CompressAction::Decompress, &input, output)
         }
     } {
+        // print error and exit
         logger::error(&e.to_string().bold());
         std::process::exit(1);
     }
@@ -59,24 +64,40 @@ fn handle_pack(
     inputs: Vec<String>,
     kub: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // print credit
+    // print headers
+    logger::section(&format!("Packing Archive"));
     if kub {
-        logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)");
+        logger::info(LZRW3A_CREDIT);
     }
 
+    // create encoder
+    let archive_type = match kub {
+        true => ArchiveType::Kub,
+        false => ArchiveType::Pak,
+    };
+
+    let mut encoder = ArchiveEncoder::new(archive_type);
+
     // add files
-    let mut encoder = ArchiveEncoder::new(if kub {
-        ArchiveType::Kub
-    } else {
-        ArchiveType::Pak
-    });
     for file in inputs.iter() {
+        // parse list file
         if file.starts_with('@') {
-            let content = fs::read_to_string(file.trim_start_matches('@'))?;
+            let list_file_path = file.trim_start_matches('@');
+            let list_file_dir = Path::new(list_file_path).parent().unwrap_or(Path::new("."));
+            let content = fs::read_to_string(list_file_path)?;
+
             for line in content.lines() {
-                let path = Path::new(line);
+                let line = line.trim();
+
+                // skip empty lines or comments
+                if line.is_empty() || line.starts_with('#') {
+                    continue;
+                }
+
+                // resolve path relative to list file's directory
+                let path = list_file_dir.join(line);
                 let name = path.file_name().unwrap().to_str().unwrap();
-                encoder.add(path)?;
+                encoder.add(&path)?;
                 logger::completion(&format!("packed file {}", name.bold()));
             }
             continue;
@@ -107,7 +128,7 @@ fn handle_unpack(
     // print header
     logger::section(&format!("Unpacking Archive"));
 
-    // define output
+    // define output and create directory automatically
     let output_str = output.unwrap_or(String::from("."));
     let output = Path::new(&output_str);
     std::fs::create_dir_all(output)?;
@@ -115,15 +136,15 @@ fn handle_unpack(
     // open archive
     let file = File::open(input)?;
     let reader = BufReader::new(file);
-    logger::completion(&format!("opened file {}", input));
     let mut archive = Archive::open(reader)?;
+    logger::completion(&format!("opened archive {}", input.bold()));
 
     // print credit
     if archive.ty == ArchiveType::Kub {
-        logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)");
+        logger::info(LZRW3A_CREDIT);
     }
 
-    // define filename map
+    // define filename map and array
     let mut names: HashMap<String, u8> = HashMap::new();
     let mut names_array = Vec::<String>::new();
 
@@ -173,12 +194,9 @@ fn handle_lzrw3a(
     input: &str,
     output: Option<String>,
 ) -> Result<(), Box<dyn std::error::Error>> {
-    // define output
-    let output = output.unwrap_or_else(|| format!("{}.out", input));
-
     // print headers
     logger::section(&format!("{} LZRW3A File", action));
-    logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)");
+    logger::info(LZRW3A_CREDIT);
 
     // read input file
     let mut file = File::open(input)?;
@@ -187,19 +205,13 @@ fn handle_lzrw3a(
     logger::completion(&format!("opened file {}", input.bold()));
 
     // process buffer
-    let result = lzrw3a::compress(action, &buffer);
-    if result.is_none() {
-        return Err("algorithm failed".into());
-    }
-
-    let buffer = result.unwrap();
+    let buffer = lzrw3a::compress(action, &buffer).ok_or("lzrw3a buffer returned null")?;
     logger::completion("processed file");
 
     // write output file
-    io::stdout().flush().unwrap();
+    let output = output.unwrap_or_else(|| format!("{}.out", input));
     let mut file = File::create(&output)?;
     file.write_all(&buffer)?;
-
     logger::completion(&format!("wrote file {}", output.bold()));
 
     Ok(())

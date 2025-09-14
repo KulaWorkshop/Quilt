@@ -21,7 +21,7 @@ A more detailed explanation is available [here](https://docs.kula.quest/tools/qu
 
 ## Installation
 
-You can download the latest release from the [releases page](https://github.com/KulaWorkshop/Quilt/releases).
+You can download the latest release for your platform from the [releases page](https://github.com/KulaWorkshop/Quilt/releases).
 
 ## Usage
 
@@ -79,8 +79,7 @@ HIDDEN 1
 LESSON
 ```
 
-> The text file format is simple - one filename per line, in the order they should appear in the archive.
-
+The text file format is simple — one filename per line, in the order they should appear in the archive.
 Instead of having to specify all of these files to build an archive, you can use the **@** parameter following the path of the text file:
 
 ```bash

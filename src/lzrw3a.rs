@@ -1,5 +1,6 @@
-use libc::{c_int, c_void, free, size_t};
 use std::slice;
+
+use libc::{c_int, c_void, free, size_t};
 
 #[link(name = "lzrw3a")]
 unsafe extern "C" {
@@ -34,6 +35,7 @@ pub fn compress(action: CompressAction, buffer: &[u8]) -> Option<Vec<u8>> {
     let mut size_out: i32 = 0;
 
     unsafe {
+        // process buffer
         let ptr = lzrw3a_c(
             action.as_c_int(),
             buffer.as_ptr(),
@@ -48,7 +50,6 @@ pub fn compress(action: CompressAction, buffer: &[u8]) -> Option<Vec<u8>> {
         // create vector and cleanup
         let vec = slice::from_raw_parts(ptr, size_out as usize).to_vec();
         free(ptr as *mut c_void);
-
         Some(vec)
     }
 }

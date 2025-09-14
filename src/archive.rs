@@ -1,13 +1,12 @@
 pub mod encoder;
 
-use byteorder::{LittleEndian, ReadBytesExt};
-use std::{
-    fs::File,
-    io::{BufRead, BufReader, Read, Seek, SeekFrom, Write},
-    path::Path,
-};
-
 use crate::lzrw3a::{self, CompressAction};
+
+use std::fs::File;
+use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
+use std::path::Path;
+
+use byteorder::{LittleEndian, ReadBytesExt};
 use flate2::read::ZlibDecoder;
 
 pub struct Archive {
@@ -134,14 +133,13 @@ impl FileEntry {
     pub fn unpack(&self, path: &Path) -> Result<usize, Box<dyn std::error::Error>> {
         let mut buffer = Vec::<u8>::new();
 
+        // decompress with lzrw3a
         if self.ty == ArchiveType::Kub {
-            let result = lzrw3a::compress(CompressAction::Decompress, &self.buffer);
-            if result.is_none() {
-                return Err("algorithm failed".into());
-            }
-
-            buffer = result.unwrap();
-        } else {
+            buffer = lzrw3a::compress(CompressAction::Decompress, &self.buffer)
+                .ok_or("lzrw3a buffer returned null")?;
+        }
+        // decompress with zlib
+        else {
             let mut decoder = ZlibDecoder::new(&self.buffer[..]);
             decoder.read_to_end(&mut buffer)?;
         }

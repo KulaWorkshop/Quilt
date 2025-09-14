@@ -2,19 +2,19 @@
 name = "quilt"
 version = "1.0.0"
 description = "A command-line utility for modifying archive files and compression used in Kula Quest."
-authors = ["SaturnKai"]
+authors = ["Brandon Gardenhire (@saturnkai)"]
 license = "MIT"
 repository = "https://github.com/kulaworkshop/quilt"
 edition = "2024"
 
 [profile.release]
 strip = true
-opt-level = "s"
 lto = true
 codegen-units = 1
 
 [build-dependencies]
 cc = "1.2.34"
+winres = "0.1.12"
 
 [dependencies]
 byteorder = "1.5.0"
