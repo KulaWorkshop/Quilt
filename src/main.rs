@@ -61,7 +61,7 @@ fn handle_pack(
 ) -> Result<(), Box<dyn std::error::Error>> {
     // print credit
     if kub {
-        logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1990)");
+        logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)");
     }
 
     // add files
@@ -120,7 +120,7 @@ fn handle_unpack(
 
     // print credit
     if archive.ty == ArchiveType::Kub {
-        logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1990)");
+        logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)");
     }
 
     // define filename map
@@ -178,7 +178,7 @@ fn handle_lzrw3a(
 
     // print headers
     logger::section(&format!("{} LZRW3A File", action));
-    logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1990)");
+    logger::info("using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)");
 
     // read input file
     let mut file = File::open(input)?;

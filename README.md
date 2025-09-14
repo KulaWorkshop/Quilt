@@ -1,5 +1,5 @@
 <h4 align="center">
-    <a href="/releases">Releases</a> |
+    <a href="https://github.com/KulaWorkshop/Quilt/releases">Releases</a> |
     <a href="https://docs.kula.quest/tools/quilt">Documentation</a>
 </h4>
 
@@ -42,7 +42,10 @@ The following example command will create an archive using the filenames inside 
 $ quilt pack HIRO.PAK @HIRO.PAK.txt
 ```
 
-### LZRW3A Compression
+By default, a **.PAK** file will be created.
+In order to create a **.KUB** file, specify the the `-k` flag in the pack arguments.
+
+### Alpha Compression
 
 In the first demo release of the game, the **.TGI** and **.GGI** files are fully compressed using an older algorithm, which Quilt can handle using the **compress** and **uncompress** commands.
 
@@ -55,5 +58,10 @@ $ quilt decompress KULA.TGI KULA.TGI.uncompressed
 
 ## Credits
 
-Developed by **[SaturnKai](https://saturnkai.dev/)**.
-Additionally, this tool uses the **LZRW3-A** compression algorithm written by **[Ross N. Williams](http://www.ross.net/compression/)**.
+Developed by **[SaturnKai](https://saturnkai.dev/)**. Additionally, this tool also uses the **LZRW3-A** compression algorithm written by **[Ross N. Williams](http://www.ross.net/compression/)**.
+
+## Changelog
+
+**Version 1.0.0 (2025-09-14)**
+
+-   Initial release.
