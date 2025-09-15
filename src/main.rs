@@ -19,6 +19,7 @@ const LZRW3A_CREDIT: &str = "using lzrw3a v1.0 by Ross N. Williams (15-Jul-1991)
 
 fn main() {
     // set virtual terminal
+    #[cfg(windows)]
     colored::control::set_virtual_terminal(true).ok();
 
     // print header

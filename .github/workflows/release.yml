@@ -1,0 +1,110 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*"
+    workflow_dispatch:
+        inputs:
+            tag_name:
+                description: "Tag name to use for naming artifacts (e.g. v1.2.3)"
+                required: false
+                default: ""
+
+env:
+    CARGO_TERM_COLOR: always
+    TAG_NAME: ${{ github.event.inputs.tag_name != '' && github.event.inputs.tag_name || github.ref_name }}
+
+jobs:
+    release:
+        name: Release - ${{ matrix.platform.release_for }}
+        strategy:
+            matrix:
+                platform:
+                    - release_for: Windows-x86_64
+                      os: windows-latest
+                      target: x86_64-pc-windows-msvc
+                      ext: zip
+
+                    - release_for: macOS-x86_64
+                      os: macOS-latest
+                      target: x86_64-apple-darwin
+                      ext: tar.gz
+
+                    - release_for: macOS-arm64
+                      os: macOS-latest
+                      target: aarch64-apple-darwin
+                      ext: tar.gz
+
+                    - release_for: Linux-x86_64
+                      os: ubuntu-20.04
+                      target: x86_64-unknown-linux-musl
+                      ext: tar.gz
+
+                    - release_for: Linux-arm64
+                      os: ubuntu-20.04
+                      target: aarch64-unknown-linux-musl
+                      ext: tar.gz
+
+        runs-on: ${{ matrix.platform.os }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Build binary
+              uses: houseabsolute/actions-rust-cross@v1
+              with:
+                  command: build
+                  target: ${{ matrix.platform.target }}
+                  args: "--locked --release"
+                  strip: true
+
+            - name: Package as archive
+              shell: bash
+              run: |
+                  TAG_NAME="${GITHUB_REF##*/}"
+                  BIN_NAME="quilt"
+                  TARGET="${{ matrix.platform.target }}"
+                  EXT="${{ matrix.platform.ext }}"
+                  OUTPUT_NAME="${BIN_NAME}-${TAG_NAME}-${TARGET}"
+
+                  BIN_PATH="target/${TARGET}/release/${BIN_NAME}"
+                  [[ "${{ matrix.platform.os }}" == "windows-latest" ]] && BIN_PATH="${BIN_PATH}.exe"
+
+                  mkdir dist
+
+                  if [[ "$EXT" == "zip" ]]; then
+                      cp "$BIN_PATH" "dist/${OUTPUT_NAME}.exe"
+                      7z a "${OUTPUT_NAME}.zip" "./dist/${OUTPUT_NAME}.exe"
+                  else
+                      cp "$BIN_PATH" "dist/${OUTPUT_NAME}"
+                      tar -czvf "${OUTPUT_NAME}.tar.gz" -C dist "${OUTPUT_NAME}"
+                  fi
+
+            - name: Upload archive
+              uses: actions/upload-artifact@v4
+              with:
+                  name: ${{ matrix.platform.release_for }}
+                  path: |
+                      *.zip
+                      *.tar.gz
+
+    github_release:
+        name: Create GitHub Release
+        needs: release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Download artifacts
+              uses: actions/download-artifact@v4
+              with:
+                  path: artifacts
+
+            - name: Create GitHub release
+              uses: softprops/action-gh-release@v1
+              with:
+                  files: artifacts/**/*.*
+                  draft: true
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
