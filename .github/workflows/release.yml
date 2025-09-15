@@ -21,7 +21,7 @@ jobs:
         strategy:
             matrix:
                 platform:
-                    - release_for: Windows-x86_64
+                    - release_for: windows-x86_64
                       os: windows-latest
                       target: x86_64-pc-windows-msvc
                       ext: zip
@@ -36,12 +36,12 @@ jobs:
                       target: aarch64-apple-darwin
                       ext: tar.gz
 
-                    - release_for: Linux-x86_64
+                    - release_for: linux-x86_64
                       os: ubuntu-latest
                       target: x86_64-unknown-linux-musl
                       ext: tar.gz
 
-                    - release_for: Linux-arm64
+                    - release_for: linux-arm64
                       os: ubuntu-latest
                       target: aarch64-unknown-linux-musl
                       ext: tar.gz
@@ -63,23 +63,23 @@ jobs:
             - name: Package as archive
               shell: bash
               run: |
-                  TAG_NAME="${GITHUB_REF##*/}"
+                  TAG_NAME="${TAG_NAME:-v0.0.0-test}"
                   BIN_NAME="quilt"
-                  TARGET="${{ matrix.platform.target }}"
                   EXT="${{ matrix.platform.ext }}"
-                  OUTPUT_NAME="${BIN_NAME}-${TAG_NAME}-${TARGET}"
+                  RELEASE_FOR="${{ matrix.platform.release_for }}"
+                  OUTPUT_NAME="${BIN_NAME}-${TAG_NAME}-${RELEASE_FOR}"
 
-                  BIN_PATH="target/${TARGET}/release/${BIN_NAME}"
+                  BIN_PATH="target/${{ matrix.platform.target }}/release/${BIN_NAME}"
                   [[ "${{ matrix.platform.os }}" == "windows-latest" ]] && BIN_PATH="${BIN_PATH}.exe"
 
-                  mkdir dist
+                  mkdir -p dist
 
                   if [[ "$EXT" == "zip" ]]; then
-                      cp "$BIN_PATH" "dist/${OUTPUT_NAME}.exe"
-                      7z a "${OUTPUT_NAME}.zip" "./dist/${OUTPUT_NAME}.exe"
+                      cp "$BIN_PATH" "dist/${BIN_NAME}.exe"
+                      7z a "${OUTPUT_NAME}.zip" "./dist/${BIN_NAME}.exe"
                   else
-                      cp "$BIN_PATH" "dist/${OUTPUT_NAME}"
-                      tar -czvf "${OUTPUT_NAME}.tar.gz" -C dist "${OUTPUT_NAME}"
+                      cp "$BIN_PATH" "dist/${BIN_NAME}"
+                      tar -czvf "${OUTPUT_NAME}.tar.gz" -C dist "${BIN_NAME}"
                   fi
 
             - name: Upload archive
