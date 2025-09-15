@@ -60,12 +60,12 @@ impl Archive {
         })
     }
 
-    pub fn entries(&mut self) -> Result<ArchiveIterator, std::io::Error> {
+    pub fn entries(&mut self) -> Result<ArchiveIterator<'_>, std::io::Error> {
         let iterator = self.get_entries()?;
         Ok(iterator)
     }
 
-    fn get_entries(&mut self) -> Result<ArchiveIterator, std::io::Error> {
+    fn get_entries(&mut self) -> Result<ArchiveIterator<'_>, std::io::Error> {
         // read file count
         self.reader.seek(SeekFrom::Start(0))?;
         let file_count = self.reader.read_u32::<LittleEndian>()?;
