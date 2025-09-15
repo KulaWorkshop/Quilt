@@ -38,12 +38,12 @@ jobs:
 
                     - release_for: linux-x86_64
                       os: ubuntu-latest
-                      target: x86_64-unknown-linux-musl
+                      target: x86_64-unknown-linux-gnu
                       ext: tar.gz
 
                     - release_for: linux-arm64
                       os: ubuntu-latest
-                      target: aarch64-unknown-linux-musl
+                      target: aarch64-unknown-linux-gnu
                       ext: tar.gz
 
         runs-on: ${{ matrix.platform.os }}
@@ -52,13 +52,14 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Build binary
-              uses: houseabsolute/actions-rust-cross@v1
+            - name: Setup Rust
+              uses: actions-rust@v2
               with:
-                  command: build
-                  target: ${{ matrix.platform.target }}
-                  args: "--locked --release"
-                  strip: true
+                  rust-version: stable
+
+            - name: Build binary
+              run: |
+                  cargo build --release --locked --target ${{ matrix.platform.target }}
 
             - name: Package as archive
               shell: bash
