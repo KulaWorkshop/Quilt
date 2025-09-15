@@ -72,15 +72,19 @@ jobs:
                   BIN_PATH="target/${{ matrix.platform.target }}/release/${BIN_NAME}"
                   [[ "${{ matrix.platform.os }}" == "windows-latest" ]] && BIN_PATH="${BIN_PATH}.exe"
 
-                  mkdir -p dist
-                  cp "$BIN_PATH" dist/
-                  cp LICENSE README.md dist/
+                  TMP_DIR=$(mktemp -d)
+                  cp "$BIN_PATH" "$TMP_DIR/"
+                  cp LICENSE README.md "$TMP_DIR/"
+
+                  pushd "$TMP_DIR"
 
                   if [[ "$EXT" == "zip" ]]; then
-                      7z a "${OUTPUT_NAME}.zip" -r dist/*
+                      7z a "${GITHUB_WORKSPACE}/${OUTPUT_NAME}.zip" *
                   else
-                      tar -czvf "${OUTPUT_NAME}.tar.gz" -C dist .
+                      tar -czvf "${GITHUB_WORKSPACE}/${OUTPUT_NAME}.tar.gz" *
                   fi
+
+                  popd
 
             - name: Upload archive
               uses: actions/upload-artifact@v4
