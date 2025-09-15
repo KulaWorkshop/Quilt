@@ -73,13 +73,13 @@ jobs:
                   [[ "${{ matrix.platform.os }}" == "windows-latest" ]] && BIN_PATH="${BIN_PATH}.exe"
 
                   mkdir -p dist
+                  cp "$BIN_PATH" dist/
+                  cp LICENSE README.md dist/
 
                   if [[ "$EXT" == "zip" ]]; then
-                      cp "$BIN_PATH" "dist/${BIN_NAME}.exe"
-                      7z a "${OUTPUT_NAME}.zip" "./dist/${BIN_NAME}.exe"
+                      7z a "${OUTPUT_NAME}.zip" -r dist/*
                   else
-                      cp "$BIN_PATH" "dist/${BIN_NAME}"
-                      tar -czvf "${OUTPUT_NAME}.tar.gz" -C dist "${BIN_NAME}"
+                      tar -czvf "${OUTPUT_NAME}.tar.gz" -C dist .
                   fi
 
             - name: Upload archive
