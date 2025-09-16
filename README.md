@@ -21,7 +21,7 @@
 -   Supports every version of the game - Kula World, Roll Away, Kula Quest, ...
 -   Supports both the extraction and creation of **.PAK** and **.KUB** files.
 -   Supports [LZRW3-A](http://www.ross.net/compression/lzrw3a.html) compressed files in the alpha version of the game.
--   Supports text files that can control precise ordering of files in large archives.
+-   Supports [text files](#using-text-files) that can control precise ordering of files in large archives.
 
 ## Usage
 
@@ -53,7 +53,7 @@ Use the `-k` flag to set the creation type to **.KUB**:
 $ quilt pack LEVELS.KUB -k LEVEL_1 LEVEL_2 LEVEL_3
 ```
 
-#### Text File
+### Using Text Files
 
 When dealing with archives that contain many files, or for quick rebuilding of an archive after making adjustments to its contents, you can use a text file containing the files that you would like to use and their order.
 You can generate this text file automatically when unpacking an archive, using the `-s` flag:
