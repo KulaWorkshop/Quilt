@@ -3,7 +3,7 @@ pub mod encoder;
 use crate::lzrw3a::{self, CompressAction};
 
 use std::fs::File;
-use std::io::{BufRead, BufReader, Read, Seek, SeekFrom, Write};
+use std::io::{BufRead, BufReader, Error, ErrorKind, Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
 use byteorder::{LittleEndian, ReadBytesExt};
@@ -35,7 +35,12 @@ pub struct FileEntry {
     ty: ArchiveType,
 }
 
-fn get_type(reader: &mut BufReader<File>) -> Result<ArchiveType, std::io::Error> {
+fn get_type(reader: &mut BufReader<File>) -> Result<ArchiveType, Error> {
+    // check if archive is empty
+    if reader.read_u32::<LittleEndian>()? == 0 {
+        return Err(Error::other("archive file is empty"));
+    }
+
     // seek to first file offset
     reader.seek(SeekFrom::Start(4))?;
     let offset = reader.read_u32::<LittleEndian>()?;
@@ -50,8 +55,11 @@ fn get_type(reader: &mut BufReader<File>) -> Result<ArchiveType, std::io::Error>
 }
 
 impl Archive {
-    pub fn open(mut reader: BufReader<File>) -> Result<Self, std::io::Error> {
-        let ty = get_type(&mut reader)?;
+    pub fn open(mut reader: BufReader<File>) -> Result<Self, Error> {
+        let ty = get_type(&mut reader).map_err(|e| match e.kind() {
+            ErrorKind::Other => Error::new(ErrorKind::InvalidData, e),
+            _ => Error::new(ErrorKind::InvalidData, "invalid archive file"),
+        })?;
 
         Ok(Self {
             reader,
@@ -60,12 +68,12 @@ impl Archive {
         })
     }
 
-    pub fn entries(&mut self) -> Result<ArchiveIterator<'_>, std::io::Error> {
+    pub fn entries(&mut self) -> Result<ArchiveIterator<'_>, Error> {
         let iterator = self.get_entries()?;
         Ok(iterator)
     }
 
-    fn get_entries(&mut self) -> Result<ArchiveIterator<'_>, std::io::Error> {
+    fn get_entries(&mut self) -> Result<ArchiveIterator<'_>, Error> {
         // read file count
         self.reader.seek(SeekFrom::Start(0))?;
         let file_count = self.reader.read_u32::<LittleEndian>()?;

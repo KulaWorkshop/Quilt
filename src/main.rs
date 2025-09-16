@@ -24,9 +24,9 @@ fn main() {
 
     // print header
     println!(
-        "{} {} by Brandon Gardenhire\n",
+        "{} v{} by Brandon Gardenhire\n",
         env!("CARGO_PKG_NAME").bold(),
-        format!("v{}", env!("CARGO_PKG_VERSION"))
+        env!("CARGO_PKG_VERSION")
     );
 
     // parse arguments
@@ -66,7 +66,7 @@ fn handle_pack(
     kub: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // print headers
-    logger::section(&format!("Packing Archive"));
+    logger::section("Packing Archive");
     if kub {
         logger::info(LZRW3A_CREDIT);
     }
@@ -127,7 +127,7 @@ fn handle_unpack(
     save_filenames: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
     // print header
-    logger::section(&format!("Unpacking Archive"));
+    logger::section("Unpacking Archive");
 
     // define output and create directory automatically
     let output_str = output.unwrap_or(String::from("."));

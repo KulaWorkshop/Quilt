@@ -7,23 +7,31 @@
 
 # Quilt
 
-[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
-![Version](https://img.shields.io/badge/Version-1.0.0-orange)
+[![MIT License](https://img.shields.io/badge/License-MIT-8b5cf6.svg)](https://opensource.org/licenses/MIT)
+![Version](https://img.shields.io/badge/Version-1.0.0-8b5cf6)
+
+**Quilt** is a command-line tool that can manage all of the compressed formats from **Kula Quest**.
 
 ![Quilt Screenshot](./.github/screenshot.png)
 
 </div>
 
-**Quilt** is a command-line tool that can extract and create archive files from Kula Quest, such as **.PAK** and **.KUB** files.
-It can also decompress and compress files using the [LZRW3-A](http://www.ross.net/compression/lzrw3a.html) algorithm used in the earliest release of the game.
+## Features
 
-A more detailed explanation is available [here](https://docs.kula.quest/tools/quilt).
-
-## Installation
-
-You can download the latest release for your platform from the [releases page](https://github.com/KulaWorkshop/Quilt/releases).
+-   Supports every version of the game - Kula World, Roll Away, Kula Quest, ...
+-   Supports both the extraction and creation of **.PAK** and **.KUB** files.
+-   Supports [LZRW3-A](http://www.ross.net/compression/lzrw3a.html) compressed files in the alpha version of the game.
+-   Supports text files that can control precise ordering of files in large archives.
 
 ## Usage
+
+More detailed information is available [here](https://docs.kula.quest/tools/quilt).
+
+### Installation
+
+The latest pre-compiled binaries are available for download on the [releases page](https://github.com/KulaWorkshop/Quilt/releases).
+
+### Archives
 
 To extract an archive file, use the **unpack** command followed by the path to the file and an output folder for its contents.
 The following example command will extract the files inside of `HIRO.PAK` into a folder called `levels`:
@@ -45,7 +53,7 @@ Use the `-k` flag to set the creation type to **.KUB**:
 $ quilt pack LEVELS.KUB -k LEVEL_1 LEVEL_2 LEVEL_3
 ```
 
-### Text File
+#### Text File
 
 When dealing with archives that contain many files, or for quick rebuilding of an archive after making adjustments to its contents, you can use a text file containing the files that you would like to use and their order.
 You can generate this text file automatically when unpacking an archive, using the `-s` flag:
@@ -114,6 +122,6 @@ Developed by **[SaturnKai](https://saturnkai.dev/)**. Additionally, this tool al
 
 ## Changelog
 
-**Version 1.0.0 (2025-09-14)**
+**Version 1.0.0 (2025-09-15)**
 
 -   Initial release.
