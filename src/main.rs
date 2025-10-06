@@ -129,11 +129,6 @@ fn handle_unpack(
     // print header
     logger::section("Unpacking Archive");
 
-    // define output and create directory automatically
-    let output_str = output.unwrap_or(String::from("."));
-    let output = Path::new(&output_str);
-    std::fs::create_dir_all(output)?;
-
     // open archive
     let file = File::open(input)?;
     let reader = BufReader::new(file);
@@ -144,6 +139,11 @@ fn handle_unpack(
     if archive.ty == ArchiveType::Kub {
         logger::info(LZRW3A_CREDIT);
     }
+
+    // define output and create directory automatically
+    let output_str = output.unwrap_or(String::from("."));
+    let output = Path::new(&output_str);
+    std::fs::create_dir_all(output)?;
 
     // define filename map and array
     let mut names: HashMap<String, u8> = HashMap::new();

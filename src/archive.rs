@@ -92,9 +92,18 @@ impl Archive {
                 let name_offset: u32 = self.reader.read_u32::<LittleEndian>()?;
                 self.reader.seek(SeekFrom::Start(name_offset as u64))?;
 
-                let mut name_buf = String::new();
-                self.reader.read_line(&mut name_buf)?;
-                name = Some(name_buf.trim_end().to_string());
+                let mut name_buff = Vec::new();
+                self.reader.read_until(b'\0', &mut name_buff)?;
+                if name_buff.last() == Some(&0) {
+                    name_buff.pop();
+                }
+
+                name = Some(
+                    String::from_utf8(name_buff)
+                        .unwrap_or("FILE".to_owned())
+                        .trim_end()
+                        .to_string(),
+                );
             }
 
             // read buffer
