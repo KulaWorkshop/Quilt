@@ -1,6 +1,6 @@
 [package]
 name = "quilt"
-version = "1.0.0"
+version = "1.0.1"
 description = "A command-line utility for modifying archive files and compression used in Kula Quest."
 authors = ["Brandon Gardenhire (@saturnkai)"]
 license = "MIT"
