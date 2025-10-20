@@ -1,6 +1,6 @@
 <h4 align="center">
     <a href="https://github.com/KulaWorkshop/Quilt/releases">Releases</a> |
-    <a href="https://docs.kula.quest/tools/quilt">Documentation</a>
+    <a href="https://wiki.kula.quest/tools/quilt">Documentation</a>
 </h4>
 
 <div align="center">
@@ -16,7 +16,7 @@
 
 </div>
 
-More detailed information is available on [the wiki](https://docs.kula.quest/tools/quilt).
+More detailed information is available on the [wiki](https://wiki.kula.quest/tools/quilt).
 
 ## Features
 
@@ -97,7 +97,7 @@ $ quilt pack "HIRO.PAK" "@levels/HIRO.PAK.txt"
 
 ## Alpha Compression
 
-In the first demo of the game, the [.TGI](https://docs.kula.quest/formats/tgi) and [.GGI](https://docs.kula.quest/formats/ggi) files are both fully compressed using the [**lzrw3a**](http://www.ross.net/compression/lzrw3a.html) algorithm.
+In the first demo of the game, the [.TGI](https://wiki.kula.quest/formats/tgi) and [.GGI](https://wiki.kula.quest/formats/ggi) files are both fully compressed using the [**lzrw3a**](http://www.ross.net/compression/lzrw3a.html) algorithm.
 Quilt allows you to decompress and recompress these files using the following examples below.
 
 For decompression, the following commands can be used:
