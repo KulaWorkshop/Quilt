@@ -7,14 +7,16 @@
 
 # Quilt
 
-[![MIT License](https://img.shields.io/badge/License-MIT-8b5cf6.svg)](https://opensource.org/licenses/MIT)
-![Version](https://img.shields.io/badge/Version-1.0.1-8b5cf6)
+[![MIT License](https://img.shields.io/badge/License-MIT-3b82f6.svg)](https://opensource.org/licenses/MIT)
+![Version](https://img.shields.io/badge/Version-1.0.2-3b82f6)
 
 **Quilt** is a command-line tool that can manage all of the compressed formats from **Kula Quest**.
 
-![Quilt Screenshot](./.github/screenshot.png)
+![Quilt Screenshot](./.github/usage-screenshot.png)
 
 </div>
+
+More detailed information is available on [the wiki](https://docs.kula.quest/tools/quilt).
 
 ## Features
 
@@ -23,15 +25,11 @@
 -   Supports [LZRW3-A](http://www.ross.net/compression/lzrw3a.html) compressed files in the alpha version of the game.
 -   Supports [text files](#using-text-files) that can control precise ordering of files in large archives.
 
-## Usage
-
-More detailed information is available [here](https://docs.kula.quest/tools/quilt).
-
-### Installation
+## Installation
 
 The latest pre-compiled binaries are available for download on the [releases page](https://github.com/KulaWorkshop/Quilt/releases).
 
-### Archives
+## Archives
 
 To extract an archive file, use the **unpack** command followed by the path to the file and an output folder for its contents.
 The following example command will extract the files inside of `HIRO.PAK` into a folder called `levels`:
@@ -97,7 +95,7 @@ $ quilt pack "HIRO.PAK" "@levels/HIRO.PAK.txt"
 > [!IMPORTANT]
 > Make sure that your files are inside the same folder as the text file.
 
-### Alpha Compression
+## Alpha Compression
 
 In the first demo of the game, the [.TGI](https://docs.kula.quest/formats/tgi) and [.GGI](https://docs.kula.quest/formats/ggi) files are both fully compressed using the [**lzrw3a**](http://www.ross.net/compression/lzrw3a.html) algorithm.
 Quilt allows you to decompress and recompress these files using the following examples below.
@@ -121,6 +119,10 @@ $ quilt compress "KULA.decompressed.GGI KULA.GGI"
 Developed by **[SaturnKai](https://saturnkai.dev/)**. Additionally, this tool also uses the **LZRW3-A** compression algorithm written by **[Ross N. Williams](http://www.ross.net/compression/)**.
 
 ## Changelog
+
+**Version 1.0.2 (2025-10-19)**
+
+-   Added support for unpacking and creating **.PAK** files without filenames embedded inside game executables.
 
 **Version 1.0.1 (2025-10-05)**
 
