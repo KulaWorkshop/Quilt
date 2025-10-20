@@ -44,7 +44,8 @@ fn main() {
             output,
             inputs,
             kub,
-        } => handle_pack(output, inputs, kub),
+            no_filenames,
+        } => handle_pack(output, inputs, kub, no_filenames),
         Commands::Compress { input, output } => {
             handle_lzrw3a(CompressAction::Compress, &input, output)
         }
@@ -64,7 +65,13 @@ fn handle_pack(
     output: String,
     inputs: Vec<String>,
     kub: bool,
+    no_filenames: bool,
 ) -> Result<(), Box<dyn std::error::Error>> {
+    // ensure no filenames is only used with pak
+    if no_filenames && kub {
+        return Err("no_filenames flag can only be used when creating pak archives".into());
+    }
+
     // print headers
     logger::section("Packing Archive");
     if kub {
@@ -85,7 +92,8 @@ fn handle_pack(
         if file.starts_with('@') {
             let list_file_path = file.trim_start_matches('@');
             let list_file_dir = Path::new(list_file_path).parent().unwrap_or(Path::new("."));
-            let content = fs::read_to_string(list_file_path)?;
+            let content = fs::read_to_string(list_file_path)
+                .map_err(|e| format!("failed to open file list - \"{}\"", e))?;
 
             for line in content.lines() {
                 let line = line.trim();
@@ -98,7 +106,9 @@ fn handle_pack(
                 // resolve path relative to list file's directory
                 let path = list_file_dir.join(line);
                 let name = path.file_name().unwrap().to_str().unwrap();
-                encoder.add(&path)?;
+                encoder
+                    .add(&path)
+                    .map_err(|e| format!("failed to pack file - \"{}\"", e))?;
                 logger::completion(&format!("packed file {}", name.bold()));
             }
             continue;
@@ -106,13 +116,17 @@ fn handle_pack(
 
         let path = Path::new(file);
         let name = path.file_name().unwrap().to_str().unwrap();
-        encoder.add(path)?;
+        encoder
+            .add(path)
+            .map_err(|e| format!("failed to pack file - \"{}\"", e))?;
         logger::completion(&format!("packed file {}", name.bold()));
     }
 
     // create archive
     let output_path = Path::new(&output);
-    encoder.pack(output_path)?;
+    encoder
+        .pack(output_path, no_filenames)
+        .map_err(|e| format!("failed to pack archive - \"{}\"", e))?;
     logger::completion(&format!(
         "wrote archive {}",
         output_path.file_name().unwrap().to_str().unwrap().bold()
@@ -130,9 +144,9 @@ fn handle_unpack(
     logger::section("Unpacking Archive");
 
     // open archive
-    let file = File::open(input)?;
+    let file = File::open(input).map_err(|e| format!("failed to open archive file - \"{}\"", e))?;
     let reader = BufReader::new(file);
-    let mut archive = Archive::open(reader)?;
+    let mut archive = Archive::open(reader).map_err(|e| format!("invalid archive - \"{}\"", e))?;
     logger::completion(&format!("opened archive {}", input.bold()));
 
     // print credit
@@ -143,14 +157,19 @@ fn handle_unpack(
     // define output and create directory automatically
     let output_str = output.unwrap_or(String::from("."));
     let output = Path::new(&output_str);
-    std::fs::create_dir_all(output)?;
+    std::fs::create_dir_all(output)
+        .map_err(|e| format!("failed to create output directory - \"{}\"", e))?;
 
     // define filename map and array
     let mut names: HashMap<String, u8> = HashMap::new();
     let mut names_array = Vec::<String>::new();
 
     // save archive contents
-    for (i, e) in archive.entries()?.enumerate() {
+    for (i, e) in archive
+        .entries()
+        .map_err(|e| format!("failed to get archive entries - \"{}\"", e))?
+        .enumerate()
+    {
         // add name to map
         let mut name = e.name.clone().unwrap_or(format!("FILE {}", i + 1));
         let entry = names.entry(name.clone());
@@ -166,7 +185,8 @@ fn handle_unpack(
 
         // unpack file and add filename to log array
         let path = output.join(&name);
-        e.unpack(&path)?;
+        e.unpack(&path)
+            .map_err(|e| format!("failed to unpack file - \"{}\"", e))?;
         logger::completion(&format!("wrote file {}", name.bold()));
         names_array.push(name);
     }

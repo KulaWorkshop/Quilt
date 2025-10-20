@@ -28,6 +28,9 @@ pub enum Commands {
         /// Create archive in KUB format (default: PAK)
         #[arg(short = 'k', long)]
         kub: bool,
+        /// Create archive with no filenames
+        #[arg(long)]
+        no_filenames: bool,
     },
     /// Compress a file with LZRW3-A
     Compress {

@@ -3,7 +3,7 @@ pub mod encoder;
 use crate::lzrw3a::{self, CompressAction};
 
 use std::fs::File;
-use std::io::{BufRead, BufReader, Error, ErrorKind, Read, Seek, SeekFrom, Write};
+use std::io::{BufRead, BufReader, Error, Read, Seek, SeekFrom, Write};
 use std::path::Path;
 
 use byteorder::{LittleEndian, ReadBytesExt};
@@ -38,7 +38,7 @@ pub struct FileEntry {
 fn get_type(reader: &mut BufReader<File>) -> Result<ArchiveType, Error> {
     // check if archive is empty
     if reader.read_u32::<LittleEndian>()? == 0 {
-        return Err(Error::other("archive file is empty"));
+        return Err(Error::other("entry list is empty"));
     }
 
     // seek to first file offset
@@ -50,16 +50,15 @@ fn get_type(reader: &mut BufReader<File>) -> Result<ArchiveType, Error> {
     let check = reader.read_u16::<LittleEndian>()?;
     Ok(match check {
         0x9C78 => ArchiveType::Pak,
-        _ => ArchiveType::Kub,
+        0x0000 => ArchiveType::Kub,
+        _ => return Err(Error::other("invalid compression signature")),
     })
 }
 
 impl Archive {
     pub fn open(mut reader: BufReader<File>) -> Result<Self, Error> {
-        let ty = get_type(&mut reader).map_err(|e| match e.kind() {
-            ErrorKind::Other => Error::new(ErrorKind::InvalidData, e),
-            _ => Error::new(ErrorKind::InvalidData, "invalid archive file"),
-        })?;
+        // get archive type
+        let ty = get_type(&mut reader)?;
 
         Ok(Self {
             reader,
@@ -98,12 +97,14 @@ impl Archive {
                     name_buff.pop();
                 }
 
-                name = Some(
-                    String::from_utf8(name_buff)
-                        .unwrap_or("FILE".to_owned())
-                        .trim_end()
-                        .to_string(),
-                );
+                if name_buff.is_empty() {
+                    name = Some(
+                        String::from_utf8(name_buff)
+                            .unwrap_or("FILE".to_owned())
+                            .trim_end()
+                            .to_string(),
+                    );
+                }
             }
 
             // read buffer
