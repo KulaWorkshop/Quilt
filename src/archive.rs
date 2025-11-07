@@ -98,6 +98,8 @@ impl Archive {
                 }
 
                 if name_buff.is_empty() {
+                    name = Some("FILE".to_owned());
+                } else {
                     name = Some(
                         String::from_utf8(name_buff)
                             .unwrap_or("FILE".to_owned())

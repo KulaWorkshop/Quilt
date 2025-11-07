@@ -8,7 +8,7 @@
 # Quilt
 
 [![MIT License](https://img.shields.io/badge/License-MIT-3b82f6.svg)](https://opensource.org/licenses/MIT)
-![Version](https://img.shields.io/badge/Version-1.0.2-3b82f6)
+![Version](https://img.shields.io/badge/Version-1.0.3-3b82f6)
 
 **Quilt** is a command-line tool that can manage all of the compressed formats from **Kula Quest**.
 
@@ -119,6 +119,10 @@ $ quilt compress "KULA.decompressed.GGI KULA.GGI"
 Developed by **[SaturnKai](https://saturnkai.dev/)**. Additionally, this tool also uses the **LZRW3-A** compression algorithm written by **[Ross N. Williams](http://www.ross.net/compression/)**.
 
 ## Changelog
+
+**Version 1.0.3 (2025-11-06)**
+
+-   Fixed an issue where **.PAK** files were not properly extracted with filenames.
 
 **Version 1.0.2 (2025-10-19)**
 
