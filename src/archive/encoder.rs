@@ -99,6 +99,7 @@ impl ArchiveEncoder {
                     writer.write_all(name.as_bytes())?;
                     writer.seek(SeekFrom::Start(((4 + file_count * 8) + 4 * i) as u64))?;
                     writer.write_u32::<LittleEndian>(name_offset)?;
+                    writer.seek(SeekFrom::End(0))?;
                 }
             }
 
