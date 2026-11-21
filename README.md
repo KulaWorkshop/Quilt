@@ -8,7 +8,7 @@
 # Quilt
 
 [![MIT License](https://img.shields.io/badge/License-MIT-3b82f6.svg)](https://opensource.org/licenses/MIT)
-![Version](https://img.shields.io/badge/Version-1.0.3-3b82f6)
+![Version](https://img.shields.io/badge/Version-1.0.4-3b82f6)
 
 **Quilt** is a command-line tool that can manage all of the compressed formats from **Kula Quest**.
 
@@ -20,10 +20,10 @@ More detailed information is available on the [wiki](https://wiki.kula.quest/too
 
 ## Features
 
--   Supports every version of the game - Kula World, Roll Away, Kula Quest, and any other previous versions.
--   Supports both the extraction and creation of **.PAK** and **.KUB** files.
--   Supports [LZRW3-A](http://www.ross.net/compression/lzrw3a.html) compressed files in the alpha version of the game.
--   Supports [text files](#using-text-files) that can control precise ordering of files in large archives.
+- Supports every version of the game - Kula World, Roll Away, Kula Quest, and any other previous versions.
+- Supports both the extraction and creation of **.PAK** and **.KUB** files.
+- Supports [LZRW3-A](http://www.ross.net/compression/lzrw3a.html) compressed files in the alpha version of the game.
+- Supports [text files](#using-text-files) that can control precise ordering of files in large archives.
 
 ## Installation
 
@@ -120,19 +120,23 @@ Developed by **[SaturnKai](https://saturnkai.dev/)**. Additionally, this tool al
 
 ## Changelog
 
+**Version 1.0.4 (2026-11-21)**
+
+- Fixed an issue where the filename table in **.PAK** files would become corrupted when packing more than one file ([#1](https://github.com/KulaWorkshop/Quilt/pull/1), thanks to [tdimeco](https://github.com/tdimeco)).
+
 **Version 1.0.3 (2025-11-06)**
 
--   Fixed an issue where **.PAK** files were not properly extracted with filenames.
+- Fixed an issue where **.PAK** files were not properly extracted with filenames.
 
 **Version 1.0.2 (2025-10-19)**
 
--   Added support for unpacking and creating **.PAK** files without filenames embedded inside game executables.
+- Added support for unpacking and creating **.PAK** files without filenames embedded inside game executables.
 
 **Version 1.0.1 (2025-10-05)**
 
--   Fixed an issue where **.PAK** files containing filenames without the new line character could not be extracted.
--   The output directory will no longer be automatically created if the archive file is invalid.
+- Fixed an issue where **.PAK** files containing filenames without the new line character could not be extracted.
+- The output directory will no longer be automatically created if the archive file is invalid.
 
 **Version 1.0.0 (2025-09-15)**
 
--   Initial release.
+- Initial release.
